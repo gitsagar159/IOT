@@ -8,7 +8,7 @@ namespace IOT.Repositories
 {
     public interface ITokenRepository
     {
-        string GenerateToken(string UserName, string MobileNumber);
+        string GenerateToken(string UserName, string MobileNumber, int UserId);
     }
 
 
@@ -22,7 +22,7 @@ namespace IOT.Repositories
             _config = config;
         }
 
-        public string GenerateToken(string UserName, string MobileNumber)
+        public string GenerateToken(string UserName, string MobileNumber, int UserId)
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
@@ -33,6 +33,7 @@ namespace IOT.Repositories
             new Claim(JwtRegisteredClaimNames.Name, UserName),
             new Claim(JwtRegisteredClaimNames.PhoneNumber, MobileNumber),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.NameId, UserId.ToString())
         };
 
             // 2. Define Signing Credentials

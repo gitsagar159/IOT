@@ -26,4 +26,6 @@ public partial class Usersmaster
     public int? UpdatedBy { get; set; }
 
     public virtual ClientMaster Client { get; set; } = null!;
+
+    public virtual ICollection<SoilReading> SoilReadings { get; set; } = new List<SoilReading>();
 }

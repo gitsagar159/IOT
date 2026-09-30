@@ -33,7 +33,8 @@ namespace IOT.Controllers
             {
                 var token = _tokenRepository.GenerateToken(
                     UserName: "101",
-                    MobileNumber: request.MobileNumber
+                    MobileNumber: request.MobileNumber,
+                    UserId:user.Id
                 );
 
                 return Ok(new { Token = token });

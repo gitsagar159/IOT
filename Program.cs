@@ -1,4 +1,5 @@
 using IOT.DBContext;
+using IOT.Middlewares;
 using IOT.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +18,13 @@ if (!string.IsNullOrEmpty(connectionString))
         options.UseMySQL(connectionString));
 }
 
+// Register IHttpContextAccessor for using in repositories and services
+builder.Services.AddHttpContextAccessor();
+
 // Services for repositories
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISoilReadingRepository, SoilReadingRepository>();
 
 //Register Token Service
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
@@ -86,6 +91,8 @@ builder.Services.AddOpenApi(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

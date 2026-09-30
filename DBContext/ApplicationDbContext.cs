@@ -15,7 +15,11 @@ public partial class ApplicationDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Auditlog> Auditlogs { get; set; }
+
     public virtual DbSet<ClientMaster> ClientMasters { get; set; }
+
+    public virtual DbSet<SoilReading> SoilReadings { get; set; }
 
     public virtual DbSet<Usersmaster> Usersmasters { get; set; }
 
@@ -25,6 +29,19 @@ public partial class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Auditlog>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("auditlogs");
+
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+            entity.Property(e => e.Method).HasMaxLength(10);
+            entity.Property(e => e.Path).HasMaxLength(2048);
+            entity.Property(e => e.QueryString).HasColumnType("text");
+            entity.Property(e => e.RequestedAt).HasMaxLength(6);
+        });
+
         modelBuilder.Entity<ClientMaster>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -56,6 +73,48 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime")
                 .HasColumnName("updated_date");
+        });
+
+        modelBuilder.Entity<SoilReading>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("soil_reading");
+
+            entity.HasIndex(e => e.Userid, "fk_user_is_idx");
+
+            entity.HasIndex(e => e.Userid, "idx_userid");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Createdby).HasColumnName("createdby");
+            entity.Property(e => e.Createddate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("createddate");
+            entity.Property(e => e.Ipaddress)
+                .HasColumnType("text")
+                .HasColumnName("ipaddress");
+            entity.Property(e => e.Isactive)
+                .HasDefaultValueSql("b'1'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("isactive");
+            entity.Property(e => e.Isdelete)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("isdelete");
+            entity.Property(e => e.Moisturevalue)
+                .HasColumnType("json")
+                .HasColumnName("moisturevalue");
+            entity.Property(e => e.Updatedby).HasColumnName("updatedby");
+            entity.Property(e => e.Updateddate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("updateddate");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+
+            entity.HasOne(d => d.User).WithMany(p => p.SoilReadings)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("fk_user_is");
         });
 
         modelBuilder.Entity<Usersmaster>(entity =>
